@@ -42,7 +42,7 @@ class SubjectView(APIView):
 				subjects_serial.save()
 				send_mail(
 					subjects_serial.data['title'],
-					subjects_serial.data['body'] + "\nreply to: " + subjects_serial.data['email'],
+					subjects_serial.data['body'] + "\nreply to: " + subjects_serial.data['email'] + f"\n rating link: http://localhost:5000/rate/{subjects_serial.data['id']}",
 					'42KLAUTOMAIL@gmail.com',#from
 					['jiongsoon@gmail.com',],#to
 					fail_silently=False,
