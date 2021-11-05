@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from .models import Response as SubjectResponse
 from .serializers import ResponseSerializer as SubjectResponseSerializer
+from subjects.models import Subjects
+from subjects.serializers import SubjectsSerializer
 from django.core.mail import send_mail
 from rest_framework.permissions import IsAuthenticated
 
@@ -25,11 +27,15 @@ class ReponseView(APIView):
 			response_serial.save()
 			send_mail(
 				response_serial.data['title'],
-				response_serial.data['body'] + f"\n rating link: http://localhost:5000/rate/{response_serial.data['subjectID']}",
+				response_serial.data['body'] + f"\nSubjectID : {response_serial.data['subjectID']}"+ f"\n rating link: http://localhost:5000/rate/{response_serial.data['subjectID']}",
 				'42KLAUTOMAIL@gmail.com',#from
 				[response_serial.data['to_email'],],#to
 				fail_silently=False,
 			)
+			subject = Subjects.objects.get(id=response_serial.data['subjectID'])
+			subject_serial = SubjectsSerializer(subject, data={"active" : "False"}, partial=True)
+			if subject_serial.is_valid():
+				subject_serial.save()
 			return Response(response_serial.data, status=204)
 		else :
 			return Response({"error" : response_serial.errors}, status=400)
